@@ -1,0 +1,153 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+
+<title></title>
+<link rel="stylesheet" href="./Css/index.css" />
+<script type="text/javascript" src="../../document/jQuery/bist/3.2.1/jquery-3.2.1.js"></script>
+<script src="../ajax_all3.js"></script>
+<script>
+$(function(){
+
+	function addZero(n){
+		return n<10?'0'+n:''+n;
+	}
+	function getTime(){
+		var oDate=new Date();
+	}
+
+	var oSend=$('#send');
+	var oSendForm=$('#send-form');
+	var oClose=$('#close');
+	var oSendBtn=$('#send-btn');
+	var oUsername=('#username');
+	var oContent=('#content');
+	var oMain=$('#main');
+	var n=0;
+
+	oSendForm.css({"left":"50%","marginLeft":-oSendForm.outerWidth()/2})
+	oSend.click(function(){
+		oSendForm.show();
+		
+	});
+	oClose.click(function(){
+		oSendForm.hide();
+	});
+	oSendBtn.click(function(){
+		var sUser=$.trim(oUsername.val());
+		var sCon=$.trim(oContent.val());
+		if(sUser=='' || sCon==''){
+			return;
+		}
+		// 1. 发表许愿
+		// wish.php?act=add&username=xxx&content=xxx
+		// 	{error:1, msg:xxx}
+		$.ajax({
+			url:'wish.php',
+			data:{
+				act:add,
+				username:sUser,
+				content:sCon
+			},
+			success:function(res){
+				var json=eval('('+res+')');
+				if(json.error){
+					alert(json.msg)
+				}else{
+					n++;
+					
+					getMsg();
+					oSendForm.hide();
+				}
+			}
+		})
+	});
+	oMain.on('click','.close',function(){
+		$(this).parents('.paper').remove();
+		if(!confirm('确定删除吗？')){
+			return;
+		}
+	})
+	function getMsg(){
+		$.ajax({
+			url:'wish.php',
+			data:{
+				act:'get'
+			},
+			success:function(){
+				var json=eval('('+res+')');
+				if(!json.error){
+					$.each(json.msg,function(i,v){
+						$('<dl class="paper a1">\
+				        <dt>\
+				            <span class="username">'+v.username+'</span>\
+				            <span class="num">No.'+v.id+'</span>\
+				        </dt>\
+				        <dd class="content">'+v.content+'</dd>\
+				        <dd class="bottom">\
+				            <span class="time">'+v.time+'</span>\
+				            <a href="" class="close"></a>\
+				        </dd>\
+				    	</dl>-').appendTo(oMain);
+					})
+				}
+			}
+		})
+	}
+})
+</script>
+</head>
+<div id='top'>
+    <span id='send'></span>
+</div>
+<div id='main'>
+    <!--<dl class='paper a1'>
+        <dt>
+            <span class='username'>智能社</span>
+            <span class='num'>No.00001</span>
+        </dt>
+        <dd class='content'>欢迎来到智能社</dd>
+        <dd class='bottom'>
+            <span class='time'>今天08:30</span>
+            <a href="" class='close'></a>
+        </dd>
+    </dl>-->
+</div>
+
+<div id="layer"></div>
+
+<div id='send-form' style="z-index:2147483647;">
+    <p class='title'><span>许下你的愿望</span><a href="javascript:;" id='close'></a></p>
+    <form action="" name='wish'>
+        <p>
+            <label for="username">昵称：</label>
+            <input type="text" name='username' id='username'/>
+        </p>
+        <p>
+            <label for="content">愿望：(您还可以输入&nbsp;<span id='font-num'>50</span>&nbsp;个字)</label>
+            <textarea name="content" id='content'></textarea>
+            <div id='phiz'>
+                <img src="./Images/phiz/zhuakuang.gif" alt="抓狂" />
+                <img src="./Images/phiz/baobao.gif" alt="抱抱" />
+                <img src="./Images/phiz/haixiu.gif" alt="害羞" />
+                <img src="./Images/phiz/ku.gif" alt="酷" />
+                <img src="./Images/phiz/xixi.gif" alt="嘻嘻" />
+                <img src="./Images/phiz/taikaixin.gif" alt="太开心" />
+                <img src="./Images/phiz/touxiao.gif" alt="偷笑" />
+                <img src="./Images/phiz/qian.gif" alt="钱" />
+                <img src="./Images/phiz/huaxin.gif" alt="花心" />
+                <img src="./Images/phiz/jiyan.gif" alt="挤眼" />
+            </div>
+        </p>
+        <span id='send-btn'></span>
+    </form>
+</div>
+<!--[if IE 6]>
+<script type="text/javascript" src="./Js/iepng.js"></script>
+<script type="text/javascript">
+    DD_belatedPNG.fix('#send,#close,.close','background');
+</script>
+<![endif]-->
+</body>
+</html>
